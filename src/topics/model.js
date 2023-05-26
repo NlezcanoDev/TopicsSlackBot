@@ -7,14 +7,6 @@ const TopicSchema = Schema(
 			required: true,
 			trim: true,
 		},
-		tags: {
-			type: Array,
-			default: [],
-		},
-		create_date: {
-			type: Date,
-			default: new Date(),
-		},
 		meeting: {
 			type: String,
 		},
