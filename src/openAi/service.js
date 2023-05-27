@@ -19,7 +19,7 @@ class OpenAiService {
 
 	async generateFromPrompt(text) {
 		const { data } = await this.#openAi.createCompletion({
-			model: "text-davinci-003",
+			model: "curie",
 			prompt: text,
 			temperature: 0,
 			max_tokens: 60,
