@@ -2,10 +2,11 @@ import express from "express";
 import morgan from "morgan";
 
 import topicsRoutes from "./topics/routes";
+import slackRoutes from "./slack/routes";
 
 import { initCron } from "./cron";
 import { openAiService } from "./openAi/service";
-import { slackApp } from "./slack";
+import { SlackApiService } from "./slack/service";
 
 const app = express();
 
@@ -18,17 +19,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 openAiService.init();
+SlackApiService.init();
 initCron.start();
 
-(async () => {
-	await slackApp.start(8080);
-	console.log("El bot está funcionando!");
-})();
-
-// https://developmentareagrupo.slack.com
-
 // routes
-app.use(topicsRoutes);
+app.use("/api/topics", topicsRoutes);
+app.use("/api/slack", slackRoutes);
 
 app.use((_, res) => {
 	res.status(404).send("Not found");

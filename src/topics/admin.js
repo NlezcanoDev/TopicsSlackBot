@@ -3,6 +3,15 @@ import { getMeeting } from "../utils/meeting";
 import { openAiService } from "../openAi/service";
 
 export class TopicsAdmin {
+	constructor() {
+		if (typeof TopicsAdmin.instance === "object") {
+			return TopicsAdmin.instance;
+		}
+
+		TopicsAdmin.instance = this;
+		return this;
+	}
+
 	async getTopics(pageSize = 15) {
 		const data = await Topic.find();
 		return data.slice(0, pageSize);
