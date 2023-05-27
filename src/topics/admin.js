@@ -1,5 +1,6 @@
 import Topic from "./model";
-import { CohereService } from "../cohere/service";
+import { getMeeting } from "../utils/meeting";
+import { openAiService } from "../openAi/service";
 
 export class TopicsAdmin {
 	async getTopics(pageSize = 15) {
@@ -13,28 +14,39 @@ export class TopicsAdmin {
 	}
 
 	async createTopic(topic) {
-		return await Topic.create(topic);
+		const payload = {
+			topic,
+			meeting: getMeeting(),
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		};
+
+		return await Topic.create(payload);
 	}
 
 	async generateTopic() {
 		const lastTitles = await this.getTitleTopics();
-		return await CohereService.generateFromHistory(lastTitles);
+		const topic = await openAiService.generateFromHistory(lastTitles);
+
+		await this.createTopic(topic);
+
+		return topic;
 	}
 
-	async editTopic(id, topic) {
-		return await Topic.findByIdAndUpdate(id, topic);
-	}
-
-	async editTitleTopic(id, title) {
+	async editTopic(id, title) {
 		const data = Topic.findById(id);
 		data.title = title;
-		Topic.findByIdAndUpdate(id, data);
+		data.updatedAt = new Date();
+		await Topic.findByIdAndUpdate(id, data);
 	}
 
 	async deleteTopics() {
 		const data = await Topic.find();
-		if (data.length > 15) {
-			return data.slice(15).forEach((d) => Topic.findByIdAndDelete(d._id));
-		}
+		if (data.length < 15) return new Error("Invalid quantity option");
+
+		return data.slice(0, 15).forEach(async (d) => {
+			const id = d._id.toString();
+			await Topic.findByIdAndDelete(id);
+		});
 	}
 }
