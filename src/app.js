@@ -3,9 +3,9 @@ import morgan from "morgan";
 
 import topicsRoutes from "./topics/routes";
 
-import { init } from "./cohere/service";
 import { initCron } from "./cron";
 import { openAiService } from "./openAi/service";
+import { slackApp } from "./slack";
 
 const app = express();
 
@@ -17,9 +17,15 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// init();
 openAiService.init();
 initCron.start();
+
+(async () => {
+	await slackApp.start(8080);
+	console.log("El bot está funcionando!");
+})();
+
+// https://developmentareagrupo.slack.com
 
 // routes
 app.use(topicsRoutes);
