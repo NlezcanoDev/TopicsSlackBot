@@ -43,10 +43,18 @@ export class TopicsAdmin {
 	}
 
 	async editTopic(id, title) {
-		const data = Topic.findById(id);
+		const data = await Topic.findById(id);
 		data.title = title;
 		data.updatedAt = new Date();
 		await Topic.findByIdAndUpdate(id, data);
+	}
+
+	async editLastTopic(title) {
+		const data = await Topic.find().sort({ createdAt: -1 }).limit(1);
+
+		if (!data.length) return new Error("Invalid request");
+
+		await Topic.findByIdAndUpdate(data[0]._id.toString(), { topic: title });
 	}
 
 	async deleteTopics() {
