@@ -22,6 +22,14 @@ const generateTopic = async (_, res) => {
 	res.status(200).json({ title: topic });
 };
 
+const updateTopic = async (req, res) => {
+	await _admin.editLastTopic(req.body.text);
+	res.status(200).json({
+		response_type: "in_channel",
+		text: "La temática fue cambiada. Happy daily!",
+	});
+};
+
 const deleteTopics = async (_, res) => {
 	await _admin.deleteTopics();
 	res.status(204).send("Ok");
@@ -32,5 +40,6 @@ export const TopicsController = {
 	getTitles,
 	createTopic,
 	generateTopic,
+	updateTopic,
 	deleteTopics,
 };

@@ -5,7 +5,7 @@ import { DATABASE_URI } from "../config";
 (async () => {
 	try {
 		const db = await connect(DATABASE_URI);
-		console.log("Db connectect to", db.connection.name);
+		console.log("-- Database " + db.connection.name + " connected --");
 	} catch (error) {
 		console.error(error);
 	}

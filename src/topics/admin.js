@@ -3,6 +3,15 @@ import { getMeeting } from "../utils/meeting";
 import { openAiService } from "../openAi/service";
 
 export class TopicsAdmin {
+	constructor() {
+		if (typeof TopicsAdmin.instance === "object") {
+			return TopicsAdmin.instance;
+		}
+
+		TopicsAdmin.instance = this;
+		return this;
+	}
+
 	async getTopics(pageSize = 15) {
 		const data = await Topic.find();
 		return data.slice(0, pageSize);
@@ -34,10 +43,18 @@ export class TopicsAdmin {
 	}
 
 	async editTopic(id, title) {
-		const data = Topic.findById(id);
+		const data = await Topic.findById(id);
 		data.title = title;
 		data.updatedAt = new Date();
 		await Topic.findByIdAndUpdate(id, data);
+	}
+
+	async editLastTopic(title) {
+		const data = await Topic.find().sort({ createdAt: -1 }).limit(1);
+
+		if (!data.length) return new Error("Invalid request");
+
+		await Topic.findByIdAndUpdate(data[0]._id.toString(), { topic: title });
 	}
 
 	async deleteTopics() {
