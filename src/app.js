@@ -1,12 +1,13 @@
 import express from "express";
 import morgan from "morgan";
+import { errorHandler } from "./middlewares/errorHandler";
 
-import topicsRoutes from "./topics/routes";
-import slackRoutes from "./slack/routes";
+import topicsRoutes from "./routes/topic.route";
+import slackRoutes from "./routes/slack.route";
 
-import { initCron } from "./cron";
-import { openAiService } from "./openAi/service";
-import { SlackApiService } from "./slack/service";
+import { openAiService } from "./services/OpenAi";
+import { slackService } from "./services/Slack";
+import { cronJobService } from "./services/CronJobs";
 
 const app = express();
 
@@ -19,15 +20,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 openAiService.init();
-SlackApiService.init();
-initCron.start();
+slackService.init();
+cronJobService.init();
 
 // routes
 app.use("/api/topics", topicsRoutes);
 app.use("/api/slack", slackRoutes);
+app.use((_, res) => res.status(404).send("Not found"));
 
-app.use((_, res) => {
-	res.status(404).send("Not found");
-});
+app.use(errorHandler);
 
 export default app;
