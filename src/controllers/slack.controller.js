@@ -1,15 +1,51 @@
-import Topic from "../models/Topic";
-import { RequestError } from "../errors";
+import Config from "../models/Config";
+import { NotFoundError, RequestError, ServerError } from "../errors";
 
-const preferTopic = async (req, res, next) => {
+const getChannels = async (req, res, next) => {
 	try {
-		const data = await Topic.find().sort({ createdAt: -1 }).limit(1);
-		if (!data.length) throw new RequestError("There is no document to edit");
+		const data = await Config.findOne();
 
-		await Topic.findByIdAndUpdate(data[0]._id.toString(), { topic: req.body.text });
+		res.status(200).json(data.slack.channels);
+	} catch (e) {
+		next(e);
+	}
+};
+
+const addChannel = async (req, res, next) => {
+	try {
+		const data = await Config.findOne();
+		if (!data.slack) throw new ServerError();
+		if (req.body.channel.length === 0) throw new RequestError();
+
+		const currentChannels = data.slack.channels;
+		console.log(currentChannels);
+
+		await Config.findOneAndUpdate({}, { slack: { channels: [...currentChannels, req.body.channel] } });
 		res.status(200).json({
 			response_type: "in_channel",
-			text: "La temática fue cambiada. Happy daily!",
+			text: "Canal agregado con éxito",
+		});
+	} catch (e) {
+		next(e);
+	}
+};
+
+const removeChannel = async (req, res, next) => {
+	try {
+		const data = await Config.findOne();
+		if (!data.slack) throw new ServerError();
+		if (req.body.channel.length <= 0) throw new RequestError();
+
+		const currentChannels = data.slack.channels;
+		const filterChannels = currentChannels.filter((c) => c !== req.body.channel);
+
+		if (currentChannels.length === filterChannels.length) throw new NotFoundError();
+
+		await Config.findOneAndUpdate({}, { slack: { channels: filterChannels } });
+
+		res.status(200).json({
+			response_type: "in_channel",
+			text: "Canal removido con éxito",
 		});
 	} catch (e) {
 		next(e);
@@ -17,5 +53,8 @@ const preferTopic = async (req, res, next) => {
 };
 
 export const SlackController = {
+	getChannels,
+	addChannel,
+	removeChannel,
 	preferTopic,
 };

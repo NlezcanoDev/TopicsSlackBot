@@ -4,6 +4,7 @@ import { errorHandler } from "./middlewares/errorHandler";
 
 import topicsRoutes from "./routes/topic.route";
 import slackRoutes from "./routes/slack.route";
+import cronjobRoutes from "./routes/cron.route";
 
 import { openAiService } from "./services/OpenAi";
 import { slackService } from "./services/Slack";
@@ -26,6 +27,7 @@ cronJobService.init();
 // routes
 app.use("/api/topics", topicsRoutes);
 app.use("/api/slack", slackRoutes);
+app.use("/api/cronjob", cronjobRoutes);
 app.use((_, res) => res.status(404).send("Not found"));
 
 app.use(errorHandler);

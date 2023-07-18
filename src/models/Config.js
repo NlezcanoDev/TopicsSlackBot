@@ -20,6 +20,12 @@ const ConfigSchema = Schema(
 				default: false,
 			},
 		},
+		slack: {
+			channels: {
+				type: Array,
+				default: [],
+			},
+		},
 	},
 	{
 		timestamps: true,

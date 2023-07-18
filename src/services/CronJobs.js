@@ -1,4 +1,5 @@
 import { CronJob } from "cron";
+import { CronController } from "../controllers/cron.controller";
 import Config from "../models/Config";
 
 // const callback = async () => {
@@ -41,6 +42,8 @@ class CronJobService {
 			console.info("CronJob is already created and working!");
 			return;
 		}
+
+		this.#callback = CronController.cronCallback;
 
 		Config.findOne({ id: 1 })
 			.exec()

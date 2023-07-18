@@ -64,7 +64,10 @@ const updateLastTopic = async (req, res, next) => {
 		if (!data.length) throw new RequestError("There is no document to edit");
 
 		await Topic.findByIdAndUpdate(data[0]._id.toString(), { topic: req.body.text });
-		res.status(200).send("Ok");
+		res.status(200).json({
+			response_type: "in_channel",
+			text: "La temática fue cambiada. Happy daily!",
+		});
 	} catch (e) {
 		next(e);
 	}
