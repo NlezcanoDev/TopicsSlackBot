@@ -42,10 +42,10 @@ class SlackService {
 		console.log("-- slack service connected --");
 	}
 
-	async postMessage(channel, text) {
+	async postMessage(text, channel) {
 		await this.#slackApp.client.chat.postMessage({
 			token: oauthToken,
-			channel,
+			channel: channel || process.env.SLACK_CHANNEL,
 			text,
 		});
 	}
@@ -60,7 +60,7 @@ class SlackService {
 	}
 }
 
-export const SlackApiService = new SlackService();
+export const slackService = new SlackService();
 
 /*
 channel: "C05AAL38CD6",
