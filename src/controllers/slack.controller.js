@@ -1,51 +1,40 @@
 import Config from "../models/Config";
 import { NotFoundError, RequestError, ServerError } from "../errors";
+import { slackService } from "../services/Slack";
 
-const getChannels = async (req, res, next) => {
+const getChannel = async (req, res, next) => {
 	try {
 		const data = await Config.findOne();
 
-		res.status(200).json(data.slack.channels);
+		res.status(200).json({ channel: data.slack.channel });
 	} catch (e) {
 		next(e);
 	}
 };
 
-const addChannel = async (req, res, next) => {
+const selectChannel = async (req, res, next) => {
 	try {
 		const data = await Config.findOne();
-		if (!data.slack) throw new ServerError();
-		if (req.body.channel.length === 0) throw new RequestError();
+		if (!data.slack) throw new ServerError("Ocurrió un error respecto a los canales. Intentalo mas tarde");
 
-		const currentChannels = data.slack.channels;
-		console.log(currentChannels);
+		const payload = req.body.text;
+		const channel = payload.startsWith("#") ? payload.substring(1) : null;
 
-		await Config.findOneAndUpdate({}, { slack: { channels: [...currentChannels, req.body.channel] } });
-		res.status(200).json({
-			response_type: "in_channel",
-			text: "Canal agregado con éxito",
-		});
-	} catch (e) {
-		next(e);
-	}
-};
+		if (!channel)
+			throw new RequestError(`¡Hola, @${data.user_id}! No especificaste un canal válido, recordá usar el "#"`);
 
-const removeChannel = async (req, res, next) => {
-	try {
-		const data = await Config.findOne();
-		if (!data.slack) throw new ServerError();
-		if (req.body.channel.length <= 0) throw new RequestError();
+		const channelId = await slackService.checkChannelList(channel);
 
-		const currentChannels = data.slack.channels;
-		const filterChannels = currentChannels.filter((c) => c !== req.body.channel);
+		if (!channelId)
+			throw new NotFoundError(
+				`¡Hola, @${data.user_id}! El canal ingresado no se encuentra en este entorno de trabajo`
+			);
 
-		if (currentChannels.length === filterChannels.length) throw new NotFoundError();
-
-		await Config.findOneAndUpdate({}, { slack: { channels: filterChannels } });
+		await Config.updateOne({ id: 1 }, { slack: { channel: channelId } });
 
 		res.status(200).json({
 			response_type: "in_channel",
-			text: "Canal removido con éxito",
+			text: "Canal seleccionado con éxito",
 		});
 	} catch (e) {
 		next(e);
@@ -53,8 +42,6 @@ const removeChannel = async (req, res, next) => {
 };
 
 export const SlackController = {
-	getChannels,
-	addChannel,
-	removeChannel,
-	preferTopic,
+	getChannel,
+	selectChannel,
 };

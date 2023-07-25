@@ -19,11 +19,15 @@ const ConfigSchema = Schema(
 				type: Boolean,
 				default: false,
 			},
+			holidayPeriod: {
+				type: Date,
+				default: null,
+			},
 		},
 		slack: {
-			channels: {
-				type: Array,
-				default: [],
+			channel: {
+				type: String,
+				default: null,
 			},
 		},
 	},

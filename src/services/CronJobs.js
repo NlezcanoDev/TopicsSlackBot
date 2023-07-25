@@ -12,7 +12,7 @@ import Config from "../models/Config";
 // 	await postTopic(topic);
 // };
 
-// export const initCron = new CronJob("0 55 11,17 * * *", callback, {
+// export const initCron = new CronJob("55 11,17 * * 1-5", callback, {
 // 	scheduled: false,
 // 	timezone: "America/Sao_Paulo",
 // });
@@ -45,7 +45,7 @@ class CronJobService {
 
 		this.#callback = CronController.cronCallback;
 
-		Config.findOne({ id: 1 })
+		Config.findOne({})
 			.exec()
 			.then(({ cron }) => {
 				this.#cronTime = cron.overrideTime || cron.crontime;
@@ -53,7 +53,7 @@ class CronJobService {
 				this.#cj.start();
 			})
 			.catch((e) => {
-				console.error("Fatal error on int CronJob: ", e.message);
+				console.error("Fatal error on init CronJob: ", e);
 			});
 	}
 
@@ -64,6 +64,11 @@ class CronJobService {
 		}
 
 		this.#cj.stop();
+	}
+
+	restart() {
+		this.stop();
+		this.init();
 	}
 
 	getCronJob() {

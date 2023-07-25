@@ -61,7 +61,7 @@ const generateTopic = async (_, res, next) => {
 const updateLastTopic = async (req, res, next) => {
 	try {
 		const data = await Topic.find().sort({ createdAt: -1 }).limit(1);
-		if (!data.length) throw new RequestError("There is no document to edit");
+		if (!data.length) throw new RequestError("No hay temática para editar");
 
 		await Topic.findByIdAndUpdate(data[0]._id.toString(), { topic: req.body.text });
 		res.status(200).json({
@@ -76,7 +76,7 @@ const updateLastTopic = async (req, res, next) => {
 const deleteTopics = async (_, res, next) => {
 	try {
 		const data = await Topic.find();
-		if (data.length < 15) return new RequestError("Invalid quantity option");
+		if (data.length < 15) return new RequestError("No tenemos tantos tópicos para eliminar");
 
 		data.slice(0, 15).forEach(async (d) => {
 			const id = d._id.toString();

@@ -1,18 +1,27 @@
 import { ExternalServiceError, RequestError, NotFoundError } from "../errors";
 
 export function errorHandler(err, req, res, next) {
+	let code, message;
 	if (err instanceof ExternalServiceError) {
 		// Log error
-		res.status(429).send({ message: err.message || "Something went wrong" });
+		code = 429;
+		message = err.message || "Oops! Algo salió mal";
 	} else if (err instanceof RequestError) {
 		// Log error
-		res.status(400).send({ message: err.message || "Bad request" });
+		code = 400;
+		message = err.message || "Creo que lo que me pedís no puede ser";
 	} else if (err instanceof NotFoundError) {
 		// Log error
-		res.status(404).send({ message: err.message || "Not found" });
+		code = 404;
+		message = err.message || "Algo nos está faltando o no lo estamos encontrando";
 	} else {
 		// Log error
-		// console.error(err.message);
-		res.status(500).send("Something went wrong");
+		code = 500;
+		message = err.message || "Houston! Tenemos un problema. Probá mas tarde";
 	}
+
+	res.status(code).json({
+		response_type: "ephemeral",
+		text: message,
+	});
 }

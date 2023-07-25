@@ -58,11 +58,11 @@ class SlackService {
 			await say(messageResponse);
 		});
 	}
+
+	async checkChannelList(channel) {
+		const list = await this.#slackApp.client.conversations.list();
+		return list.channels.find((c) => c === channel).id;
+	}
 }
 
 export const slackService = new SlackService();
-
-/*
-channel: "C05AAL38CD6",
-text: `La temática de esta daily es ${message}`,
-*/
