@@ -1,9 +1,12 @@
 import Config from "../models/Config";
 import Topic from "../models/Topic";
+
 import { slackService } from "../services/Slack";
 import { openAiService } from "../services/OpenAi";
-import { RequestError } from "../errors";
 import { cronJobService } from "../services/CronJobs";
+
+import { getMeeting } from "../utils/meeting";
+import { ExternalServiceError, RequestError } from "../errors";
 
 const cronCallback = async () => {
 	try {
@@ -11,8 +14,10 @@ const cronCallback = async () => {
 		const lastTopics = data.slice(0, 15);
 		const lastTitles = lastTopics.map((d) => d.topic);
 		let needsRestart = false;
+		let needsUpdate = true;
 
 		const { slack, cron: cronjob } = await Config.findOne();
+		const baseCronjob = cronjob;
 
 		if (cronjob.hasOverrideTime) {
 			cronjob.overrideTime = null;
@@ -22,20 +27,33 @@ const cronCallback = async () => {
 
 		const now = new Date();
 		if (new Date(cronjob.holidayPeriod) > now) {
-			cronjob.hasCallback = false; // TODO validar
+			cronjob.hasCallback = false;
 		} else {
 			cronjob.holidayPeriod = null;
 		}
 
 		if (cronjob.hasCallback) {
 			const topic = await openAiService.generateFromHistory(lastTitles);
-			const message = `La temática de la siguiente reunión es: ${topic}`;
+
+			if (topic instanceof Error) {
+				await slackService.postMessage("Oops Topic-bot no se siente bien", slack.channel);
+				throw new ExternalServiceError("Error en la generación de temática");
+			}
+			await Topic.create({
+				topic: topic.replace("\t", ""),
+				meeting: getMeeting(),
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			});
+
+			const message = `La temática de la siguiente reunión es: ${topic.replace("\t", "")}`;
+
 			await slackService.postMessage(message, slack.channel);
 		} else {
 			cronjob.hasCallback = true;
 		}
 
-		await Config.findOneAndUpdate({}, { cron: { ...cronjob } });
+		if (baseCronjob !== cronjob) await Config.findOneAndUpdate({}, { cron: { ...cronjob } });
 		if (needsRestart) cronJobService.restart();
 	} catch (e) {
 		// TODO generar log
@@ -47,7 +65,7 @@ const omitTask = async (req, res, next) => {
 	try {
 		const { slack } = await Config.findOne();
 
-		await Config.findOneAndUpdate({}, { $set: { "cronjob.hascallback": false } }, { overwrite: false });
+		await Config.findOneAndUpdate({}, { $set: { "cron.hasCallback": false } }, { overwrite: false });
 
 		if (req.body.channel_id !== slack.channel)
 			await slackService.postMessage("Se omitió la proxima reunión. Nos vemos luego!", slack.channel);
@@ -128,7 +146,7 @@ const setReturnDay = async (req, res, next) => {
 
 		const returnDay = new Date(dateYear, dateMonth, day);
 
-		await Config.findOneAndUpdate({}, { $set: { "cronjob.holidayPeriod": returnDay } });
+		await Config.findOneAndUpdate({}, { $set: { "cron.holidayPeriod": returnDay } });
 
 		res.status(200).json({
 			response_type: "in_channel",

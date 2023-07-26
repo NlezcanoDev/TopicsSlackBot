@@ -28,35 +28,37 @@ class OpenAiService {
 
 	async generateFromPrompt(text) {
 		try {
-			const { data } = await this.#openAi.createCompletion({
-				model: "curie",
-				prompt: text,
-				temperature: 0,
-				max_tokens: 60,
-				top_p: 1,
-				frequency_penalty: 0.5,
-				presence_penalty: 0,
+			const { data } = await this.#openAi.createChatCompletion({
+				model: "gpt-3.5-turbo",
+				messages: [
+					{
+						role: "assistant",
+						content: text,
+					},
+				],
+				temperature: 0.8,
+				max_tokens: 80,
 			});
 
-			if (data?.choices[0].text.includes("\n")) {
-				return data?.choices[0].text.split("\n").filter((d) => d)[0];
+			if (data?.choices[0].message.content.includes("\n")) {
+				return data?.choices[0].message.content.split("\n").filter((d) => d)[0];
 			}
 
-			return data?.choices[0].text || "";
+			return data?.choices[0].message.content || "";
 		} catch {
 			// Log
-			throw new ExternalServiceError();
+			return new ExternalServiceError();
 		}
 	}
 
 	async generateFromHistory(historyList) {
 		const text = `
 			Necesito crear un nuevo tópico para una reunion informal donde los 
-			participantes deben tener un gif representacional obtenido de Tenor.
-			Por ejemplo, los ultimos tópicos fueron:
-			${historyList.join("-- \n")}
+			participantes deben tener un gif que represente la temática.
+			Por ejemplo:
+			${historyList.join(", ")}
 
-			El próximo tópico será
+			Basándote en ese formato y sin repetir, dime la proxima temática de manera random
 		`;
 
 		return await this.generateFromPrompt(text);
