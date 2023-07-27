@@ -1,4 +1,5 @@
 export const getMeeting = () => {
 	const now = new Date().getHours();
-	return now < 12 || now > 18 ? "daily_dia" : "daily_tarde";
+	const currentHour = now - 3;
+	return currentHour < 12 || currentHour > 18 ? "daily_dia" : "daily_tarde";
 };

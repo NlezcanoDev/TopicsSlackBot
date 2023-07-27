@@ -50,15 +50,6 @@ class SlackService {
 		});
 	}
 
-	async receiveCommand(commmand, callback) {
-		this.#slackApp.command(commmand, async (command, ack, say) => {
-			await ack();
-
-			const messageResponse = callback(command);
-			await say(messageResponse);
-		});
-	}
-
 	async checkChannelList(channel) {
 		const list = await this.#slackApp.client.conversations.list();
 		return list.channels.find((c) => c === channel).id;

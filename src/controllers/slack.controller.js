@@ -30,7 +30,7 @@ const selectChannel = async (req, res, next) => {
 				`¡Hola, @${data.user_id}! El canal ingresado no se encuentra en este entorno de trabajo`
 			);
 
-		await Config.updateOne({ id: 1 }, { slack: { channel: channelId } });
+		await Config.findOneAndUpdate({}, { slack: { channel: channelId } });
 
 		res.status(200).json({
 			response_type: "in_channel",
