@@ -1,6 +1,7 @@
 import { CronJob } from "cron";
 import { CronController } from "../controllers/cron.controller";
 import Config from "../models/Config";
+import { createLog } from "../utils/db";
 
 class CronJobService {
 	/**
@@ -38,7 +39,8 @@ class CronJobService {
 				this.#cj.start();
 			})
 			.catch((e) => {
-				console.error("Fatal error on init CronJob: ", e);
+				createLog(e, "Error al iniciar cronjob");
+				console.error("Fatal error on init CronJob");
 			});
 	}
 

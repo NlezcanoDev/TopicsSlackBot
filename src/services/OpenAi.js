@@ -1,6 +1,7 @@
 import { Configuration, OpenAIApi } from "openai";
 import { config } from "dotenv";
 import { ExternalServiceError } from "../errors";
+import { createLog } from "../utils/db";
 
 config();
 
@@ -45,9 +46,8 @@ class OpenAiService {
 			}
 
 			return data?.choices[0].message.content || "";
-		} catch {
-			// Log
-			return new ExternalServiceError();
+		} catch (e) {
+			return new Error();
 		}
 	}
 

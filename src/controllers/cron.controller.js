@@ -7,6 +7,7 @@ import { cronJobService } from "../services/CronJobs";
 
 import { getMeeting } from "../utils/meeting";
 import { ExternalServiceError, RequestError } from "../errors";
+import { createLog } from "../utils/db";
 
 const cronCallback = async () => {
 	try {
@@ -56,7 +57,7 @@ const cronCallback = async () => {
 		if (baseCronjob !== cronjob) await Config.findOneAndUpdate({}, { cron: { ...cronjob } });
 		if (needsRestart) cronJobService.restart();
 	} catch (e) {
-		// TODO generar log
+		if (!(e instanceof ExternalServiceError)) createLog(e);
 		console.error(e.message);
 	}
 };

@@ -1,7 +1,7 @@
 import Topic from "../models/Topic";
 import { getMeeting } from "../utils/meeting";
 import { openAiService } from "../services/OpenAi";
-import { RequestError } from "../errors";
+import { ExternalServiceError, RequestError } from "../errors";
 
 const getTopics = async (req, res, next) => {
 	const { pageSize } = req.query.filter || 15;
@@ -51,6 +51,8 @@ const generateTopic = async (_, res, next) => {
 		const lastTitles = lastTopics.map((d) => d.topic);
 
 		const topic = await openAiService.generateFromHistory(lastTitles);
+
+		if (topic instanceof Error) throw new ExternalServiceError("Error en la generación de temática");
 
 		res.status(200).json({ title: topic });
 	} catch (e) {
