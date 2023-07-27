@@ -1,5 +1,6 @@
 import { App } from "@slack/bolt";
 import { config } from "dotenv";
+import Config from "../models/Config";
 
 config();
 const clientId = process.env.SLACK_CLIENT_ID;
@@ -43,9 +44,14 @@ class SlackService {
 	}
 
 	async postMessage(text, channel) {
+		if (!channel) {
+			const { slack } = await Config.findOne();
+			channel = slack.channel;
+		}
+
 		await this.#slackApp.client.chat.postMessage({
 			token: oauthToken,
-			channel: channel || process.env.SLACK_CHANNEL,
+			channel: channel,
 			text,
 		});
 	}

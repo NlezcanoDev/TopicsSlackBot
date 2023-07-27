@@ -1,7 +1,5 @@
 import { Configuration, OpenAIApi } from "openai";
 import { config } from "dotenv";
-import { ExternalServiceError } from "../errors";
-import { createLog } from "../utils/db";
 
 config();
 
