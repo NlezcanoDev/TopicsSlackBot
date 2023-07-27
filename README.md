@@ -4,8 +4,8 @@ Se trata de un bot que genera temáticas aleatorias para reuniones virtuales gen
 
 ## Contenido
 
-1. [Desarrollo](#Desarrollo)
-2. [Tecnologías](#tecnologias)
+1. [Desarrollo](#desarrollo)
+2. [Tecnologías](#tecnologías)
 3. [Comandos](#comandos)
 4. [Proceso](#proceso)
 
