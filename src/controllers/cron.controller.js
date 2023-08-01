@@ -62,6 +62,39 @@ const cronCallback = async () => {
 	}
 };
 
+const startCronjob = async (req, res, next) => {
+	try {
+		cronJobService.init();
+		res.status(200).json({
+			message: "Cronjob initialized correctly",
+		});
+	} catch (e) {
+		next(e);
+	}
+};
+
+const stopCronjob = async (req, res, next) => {
+	try {
+		cronJobService.stop();
+		res.status(200).json({
+			message: "Cronjob stopped correctly",
+		});
+	} catch (e) {
+		next(e);
+	}
+};
+
+const restartCronjob = async (req, res, next) => {
+	try {
+		cronJobService.restart();
+		res.status(200).json({
+			message: "Cronjob restarted correctly",
+		});
+	} catch (e) {
+		next(e);
+	}
+};
+
 const omitTask = async (req, res, next) => {
 	try {
 		const { slack } = await Config.findOne();
@@ -160,6 +193,9 @@ const setReturnDay = async (req, res, next) => {
 
 export const CronController = {
 	cronCallback,
+	startCronjob,
+	stopCronjob,
+	restartCronjob,
 	omitTask,
 	postponeTask,
 	setReturnDay,
