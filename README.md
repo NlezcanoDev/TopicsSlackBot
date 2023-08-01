@@ -30,11 +30,11 @@ El proceso comienza desde la instalación del bot en el entorno de trabajo, asig
 
 -   `/omitir` : Omite la próxima daily/reunión programada para evitar notificaciones y consumo extra.
 
--   `/posponer [hh:mm]` : Pospone el horario para la próxima reunión respetando horarios laborales
+-   `/posponer-meet [hh:mm]` : Pospone el horario para la próxima reunión respetando horarios laborales
 
--   `/volvemos el [dd]` : Indica el dia de retorno. Pensado para usos de feriados o dias donde no se trabaja. Se busca omitir notificaciones y temáticas hasta la fecha (en dias) establecida
+-   `/volvemos-el [dd]` : Indica el dia de retorno. Pensado para usos de feriados o dias donde no se trabaja. Se busca omitir notificaciones y temáticas hasta la fecha (en dias) establecida
 
--   `/seleccionar canal [#canal]` : Modifica el canal donde se realizan las alertas
+-   `/seleccionar-canal [#canal]` : Modifica el canal donde se realizan las alertas
 
 > Todos estos comandos pueden realizarse desde el chat privado con Topic-bot o desde el canal establecido para el funcionamiento
 
