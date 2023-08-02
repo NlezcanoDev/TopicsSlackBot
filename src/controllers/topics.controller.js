@@ -4,24 +4,12 @@ import { openAiService } from "../services/OpenAi";
 import { ExternalServiceError, RequestError } from "../errors";
 
 const getTopics = async (req, res, next) => {
-	const { pageSize } = req.query.filter || 15;
+	const { pageSize } = req.query || 15;
 
 	try {
-		const data = await Topic.find();
+		const data = await Topic.find().sort({ createdAt: -1 });
 		const topics = data.slice(0, pageSize);
 		res.status(200).json(topics);
-	} catch (e) {
-		next(e);
-	}
-};
-
-const getTitles = async (_, res, next) => {
-	const { filter } = req.query;
-	try {
-		const data = await Topic.find();
-		const topics = data.slice(0, filter.pageSize || 15);
-		const titles = topics.map((d) => d.topic);
-		res.status(200).json(titles);
 	} catch (e) {
 		next(e);
 	}
@@ -46,7 +34,7 @@ const createTopic = async (req, res, next) => {
 
 const generateTopic = async (_, res, next) => {
 	try {
-		const data = await Topic.find();
+		const data = await Topic.find().sort({ createdAt: -1 });
 		const lastTopics = data.slice(0, 15);
 		const lastTitles = lastTopics.map((d) => d.topic);
 
@@ -92,7 +80,6 @@ const deleteTopics = async (_, res, next) => {
 
 export const TopicsController = {
 	getTopics,
-	getTitles,
 	createTopic,
 	generateTopic,
 	updateLastTopic,

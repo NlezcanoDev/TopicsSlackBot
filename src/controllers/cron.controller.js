@@ -11,14 +11,12 @@ import { createLog } from "../utils/db";
 
 const cronCallback = async () => {
 	try {
-		const data = await Topic.find();
+		const data = await Topic.find().sort({ createdAt: -1 });
 		const lastTopics = data.slice(0, 15);
 		const lastTitles = lastTopics.map((d) => d.topic);
 		let needsRestart = false;
-		let needsUpdate = true;
 
 		const { slack, cron: cronjob } = await Config.findOne();
-		const baseCronjob = cronjob;
 
 		if (cronjob.hasOverrideTime) {
 			cronjob.overrideTime = null;
@@ -54,7 +52,7 @@ const cronCallback = async () => {
 			cronjob.hasCallback = true;
 		}
 
-		if (baseCronjob !== cronjob) await Config.findOneAndUpdate({}, { cron: { ...cronjob } });
+		await Config.findOneAndUpdate({}, { cron: { ...cronjob } });
 		if (needsRestart) cronJobService.restart();
 	} catch (e) {
 		if (!(e instanceof ExternalServiceError)) createLog(e);
