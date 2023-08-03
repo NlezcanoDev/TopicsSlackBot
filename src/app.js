@@ -28,6 +28,13 @@ cronJobService.init();
 app.use("/api/topics", topicsRoutes);
 app.use("/api/slack", slackRoutes);
 app.use("/api/cronjob", cronjobRoutes);
+app.use("/metrics", (res, req) => {
+	console.log(req.getHeaders());
+	console.log(req);
+	console.log(res);
+
+	res.send(200);
+});
 app.use((_, res) => res.status(404).send("Not found"));
 
 app.use(errorHandler);
