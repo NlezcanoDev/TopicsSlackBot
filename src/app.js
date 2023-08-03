@@ -1,5 +1,4 @@
 import express from "express";
-// import morgan from "morgan";
 import { errorHandler } from "./middlewares/errorHandler";
 
 import topicsRoutes from "./routes/topic.route";
@@ -16,7 +15,6 @@ const app = express();
 app.set("port", process.env.PORT || 3000);
 
 // middlewares
-// app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

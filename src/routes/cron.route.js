@@ -3,7 +3,6 @@ import { CronController } from "../controllers/cron.controller";
 
 const router = Router();
 
-router.post("/start", CronController.startCronjob);
 router.post("/stop", CronController.stopCronjob);
 router.post("/restart", CronController.restartCronjob);
 

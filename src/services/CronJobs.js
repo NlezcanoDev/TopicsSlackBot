@@ -51,6 +51,7 @@ class CronJobService {
 		}
 
 		this.#cj.stop();
+		this.#cj = undefined;
 	}
 
 	restart() {

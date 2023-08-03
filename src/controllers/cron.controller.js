@@ -60,17 +60,6 @@ const cronCallback = async () => {
 	}
 };
 
-const startCronjob = async (req, res, next) => {
-	try {
-		cronJobService.init();
-		res.status(200).json({
-			message: "Cronjob initialized correctly",
-		});
-	} catch (e) {
-		next(e);
-	}
-};
-
 const stopCronjob = async (req, res, next) => {
 	try {
 		cronJobService.stop();
@@ -116,14 +105,14 @@ const postponeTask = async (req, res, next) => {
 	const validBody = /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(payload);
 	const [hour, min] = payload.split(":");
 
-	const nHour = Number(hour);
+	const nHour = Number(hour) + 3;
 	const nMin = Number(min);
 
 	try {
 		if (!validBody || isNaN(nHour) || isNaN(nMin))
 			throw new RequestError("Error en el formato de hora. Recordá usar el formato hh:mm");
 
-		if (nHour < 0 || nHour > 18 || nMin < 0 || nMin > 60)
+		if (nHour < 12 || nHour > 21 || nMin < 0 || nMin > 60)
 			throw new RequestError("Mmmm eso no parece un horario laboral");
 
 		const now = new Date();
@@ -191,7 +180,6 @@ const setReturnDay = async (req, res, next) => {
 
 export const CronController = {
 	cronCallback,
-	startCronjob,
 	stopCronjob,
 	restartCronjob,
 	omitTask,
