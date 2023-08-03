@@ -9,6 +9,7 @@ import cronjobRoutes from "./routes/cron.route";
 import { openAiService } from "./services/OpenAi";
 import { slackService } from "./services/Slack";
 import { cronJobService } from "./services/CronJobs";
+import { createLog } from "./utils/db";
 
 const app = express();
 
@@ -29,11 +30,9 @@ app.use("/api/topics", topicsRoutes);
 app.use("/api/slack", slackRoutes);
 app.use("/api/cronjob", cronjobRoutes);
 app.use("/metrics", (res, req) => {
-	console.log(req.getHeaders());
-	console.log(req);
-	console.log(res);
+	createLog(req);
 
-	res.send(200);
+	res.statusCode(200);
 });
 app.use((_, res) => res.status(404).send("Not found"));
 
