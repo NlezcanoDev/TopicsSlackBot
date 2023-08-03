@@ -30,9 +30,9 @@ app.use("/api/topics", topicsRoutes);
 app.use("/api/slack", slackRoutes);
 app.use("/api/cronjob", cronjobRoutes);
 app.use("/metrics", (res, req) => {
-	createLog(req);
+	createLog(req.getHeader());
 
-	res.statusCode(200);
+	res.status(200);
 });
 app.use((_, res) => res.status(404).send("Not found"));
 
