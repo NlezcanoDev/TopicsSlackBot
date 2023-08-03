@@ -41,7 +41,17 @@ const selectChannel = async (req, res, next) => {
 	}
 };
 
+const testService = async (req, res, next) => {
+	try {
+		const data = await Config.findOne();
+		await slackService.postMessage("Test message", data.slack.channel);
+	} catch (e) {
+		next(e);
+	}
+};
+
 export const SlackController = {
 	getChannel,
 	selectChannel,
+	testService,
 };
