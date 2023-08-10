@@ -66,7 +66,10 @@ const regenerateTopic = async (_, res, next) => {
 
 		await Topic.findByIdAndUpdate(lastTopics[0]._id.toString(), { topic: data });
 
-		res.status(200).json({ title: data });
+		res.status(200).json({
+			response_type: "in_channel",
+			text: `La nueva temática es ${data}`,
+		});
 	} catch (e) {
 		next(e);
 	}
@@ -101,7 +104,11 @@ const specifyLastTopic = async (req, res, next) => {
 
 		if (topic instanceof Error) throw new ExternalServiceError("Error en la generación de temática");
 
-		res.status(200).json({ title: topic, topico: lastTitle });
+		await Topic.findByIdAndUpdate(lastTopic[0]._id.toString(), { topic });
+		res.status(200).json({
+			response_type: "in_channel",
+			text: `La nueva temática es ${topic}`,
+		});
 	} catch (e) {
 		next(e);
 	}
