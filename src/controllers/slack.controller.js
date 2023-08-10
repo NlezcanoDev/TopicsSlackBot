@@ -45,6 +45,7 @@ const testService = async (req, res, next) => {
 	try {
 		const data = await Config.findOne();
 		await slackService.postMessage("Test message", data.slack.channel);
+		res.status(200);
 	} catch (e) {
 		next(e);
 	}
