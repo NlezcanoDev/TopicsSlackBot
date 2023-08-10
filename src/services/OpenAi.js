@@ -31,7 +31,7 @@ class OpenAiService {
 				model: "gpt-3.5-turbo",
 				messages: [
 					{
-						role: "assistant",
+						role: "system",
 						content: text,
 					},
 				],
@@ -51,12 +51,13 @@ class OpenAiService {
 
 	async generateFromHistory(historyList) {
 		const text = `
-			Necesito crear un nuevo tópico para una reunion informal donde los 
-			participantes deben tener un gif que represente la temática.
-			Por ejemplo:
+			Necesito crear una nueva temática para una reunion informal que sea graciosa o pueda generar anecdotas.
+			Recordá que somos un grupo de jovenes adultos algo nerds.
+			Algunos ejemplos son:
 			${historyList.join(", ")}
 
-			Basándote en ese formato y sin repetir, dime la proxima temática de manera random
+			Basándote en ese formato y sin repetir, dime la proxima temática de manera random.
+			Recordá que solo necesito el titulo de la temática.
 		`;
 
 		return await this.generateFromPrompt(text);
